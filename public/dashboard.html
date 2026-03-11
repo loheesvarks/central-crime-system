@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Central Crime System Management</title>
+  <link rel="stylesheet" href="styles-premium.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🇮🇳</span>
+      <span class="brand-text">Central Crime System Management</span>
+      <span class="brand-subtitle">National Crime Database</span>
+    </div>
+    <div class="nav-menu">
+      <span id="userInfo"></span>
+      <button onclick="logout()" class="btn-secondary">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Stats Dashboard -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value" id="totalRecords">0</div>
+        <div class="stat-label">Total Records</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚖️</div>
+        <div class="stat-value" id="convictedCount">0</div>
+        <div class="stat-label">Convicted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value" id="pendingCount">0</div>
+        <div class="stat-label">Pending Cases</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✓</div>
+        <div class="stat-value" id="acquittedCount">0</div>
+        <div class="stat-label">Acquitted</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('news')">📰 Crime News</button>
+      <button class="tab-btn" onclick="showTab('records')">📋 Records Management</button>
+    </div>
+
+    <!-- News Section -->
+    <div id="newsTab" class="tab-content active">
+      <div class="section-header">
+        <h2>Real-Time Crime News</h2>
+        <div class="state-selector">
+          <label>Select State:</label>
+          <select id="stateSelect" onchange="loadNews()">
+            <option value="India">🇮🇳 All India</option>
+            <optgroup label="Northern States">
+              <option value="Delhi">Delhi</option>
+              <option value="Haryana">Haryana</option>
+              <option value="Himachal Pradesh">Himachal Pradesh</option>
+              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+              <option value="Ladakh">Ladakh</option>
+              <option value="Punjab">Punjab</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="Uttarakhand">Uttarakhand</option>
+            </optgroup>
+            <optgroup label="Southern States">
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Puducherry">Puducherry</option>
+            </optgroup>
+            <optgroup label="Eastern States">
+              <option value="Bihar">Bihar</option>
+              <option value="Jharkhand">Jharkhand</option>
+              <option value="Odisha">Odisha</option>
+              <option value="West Bengal">West Bengal</option>
+            </optgroup>
+            <optgroup label="Western States">
+              <option value="Goa">Goa</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Maharashtra">Maharashtra</option>
+            </optgroup>
+            <optgroup label="Central States">
+              <option value="Chhattisgarh">Chhattisgarh</option>
+              <option value="Madhya Pradesh">Madhya Pradesh</option>
+            </optgroup>
+            <optgroup label="North-Eastern States">
+              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+              <option value="Assam">Assam</option>
+              <option value="Manipur">Manipur</option>
+              <option value="Meghalaya">Meghalaya</option>
+              <option value="Mizoram">Mizoram</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Sikkim">Sikkim</option>
+              <option value="Tripura">Tripura</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div id="newsContainer" class="news-grid"></div>
+    </div>
+
+    <!-- Records Section -->
+    <div id="recordsTab" class="tab-content">
+      <div class="section-header">
+        <h2>Criminal Records Management</h2>
+        <button onclick="showAddModal()" class="btn-primary">+ Add New Record</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <input type="text" id="filterName" placeholder="Filter by Name">
+        <input type="text" id="filterCrime" placeholder="Filter by Crime">
+        <select id="filterState">
+          <option value="">All States/UTs</option>
+          <optgroup label="Northern">
+            <option value="Delhi">Delhi</option>
+            <option value="Haryana">Haryana</option>
+            <option value="Punjab">Punjab</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+          </optgroup>
+          <optgroup label="Southern">
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Telangana">Telangana</option>
+          </optgroup>
+          <optgroup label="Eastern">
+            <option value="Bihar">Bihar</option>
+            <option value="Jharkhand">Jharkhand</option>
+            <option value="Odisha">Odisha</option>
+            <option value="West Bengal">West Bengal</option>
+          </optgroup>
+          <optgroup label="Western">
+            <option value="Goa">Goa</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Maharashtra">Maharashtra</option>
+          </optgroup>
+        </select>
+        <select id="filterStatus">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="convicted">Convicted</option>
+          <option value="acquitted">Acquitted</option>
+        </select>
+        <button onclick="applyFilters()" class="btn-primary">Apply</button>
+        <button onclick="clearFilters()" class="btn-secondary">Clear</button>
+      </div>
+
+      <div id="recordsGrid" class="records-grid"></div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="recordModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Add New Record</h2>
+      <form id="recordForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="name" required>
+          </div>
+          <div class="form-group">
+            <label>Crime Type</label>
+            <input type="text" id="crime" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Birth Date</label>
+            <input type="date" id="born_date" required onchange="calcAge()">
+          </div>
+          <div class="form-group">
+            <label>Crime Date</label>
+            <input type="date" id="crime_date" required>
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="age" readonly>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Upload Photo</label>
+            <div class="file-upload-wrapper">
+              <input type="file" id="photo_file" accept="image/*" onchange="handlePhotoUpload(event)">
+              <div id="photoPreview" class="photo-preview"></div>
+              <input type="hidden" id="photo_url">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>State/UT</label>
+            <select id="state" required>
+              <optgroup label="Northern States">
+                <option value="Delhi">Delhi</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                <option value="Ladakh">Ladakh</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+              </optgroup>
+              <optgroup label="Southern States">
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Puducherry">Puducherry</option>
+              </optgroup>
+              <optgroup label="Eastern States">
+                <option value="Bihar">Bihar</option>
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Odisha">Odisha</option>
+                <option value="West Bengal">West Bengal</option>
+              </optgroup>
+              <optgroup label="Western States">
+                <option value="Goa">Goa</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Maharashtra">Maharashtra</option>
+              </optgroup>
+              <optgroup label="Central States">
+                <option value="Chhattisgarh">Chhattisgarh</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+              </optgroup>
+              <optgroup label="North-Eastern States">
+                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="Manipur">Manipur</option>
+                <option value="Meghalaya">Meghalaya</option>
+                <option value="Mizoram">Mizoram</option>
+                <option value="Nagaland">Nagaland</option>
+                <option value="Sikkim">Sikkim</option>
+                <option value="Tripura">Tripura</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sentence (Years)</label>
+            <input type="number" id="sentence_years" min="0">
+          </div>
+          <div class="form-group">
+            <label>Case Status</label>
+            <select id="case_status">
+              <option value="pending">Pending</option>
+              <option value="convicted">Convicted</option>
+              <option value="acquitted">Acquitted</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sentence Details</label>
+          <textarea id="sentence_details" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Record</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close" onclick="closeDetailModal()">&times;</span>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

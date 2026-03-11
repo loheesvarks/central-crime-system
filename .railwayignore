@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.env
+*.log
+.DS_Store
+fix_database.js
+TEST_CONNECTION.bat
+INSTALL.bat
+START_SERVER.bat
+README.md
+SETUP.md
+QUICK_START.md

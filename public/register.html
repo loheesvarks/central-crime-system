@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Central Crime System Management</title>
+  <link rel="stylesheet" href="styles-premium.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>📝 Create Account</h1>
+        <p>Join the Central Crime System Management</p>
+      </div>
+      
+      <form id="registerForm" class="auth-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" required placeholder="Choose a username">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="Enter your email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="Create a password">
+        </div>
+        
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role">
+            <option value="officer">Officer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn-primary">Register</button>
+        
+        <div class="auth-footer">
+          <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+      </form>
+      
+      <div id="message" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
+      const messageDiv = document.getElementById('message');
+      
+      try {
+        const response = await fetch(`${window.location.hostname === 'localhost' ? 'http://localhost:3000' : window.location.origin}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, role })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          messageDiv.className = 'message success';
+          messageDiv.textContent = 'Registration successful! Redirecting to login...';
+          setTimeout(() => window.location.href = 'login.html', 1500);
+        } else {
+          messageDiv.className = 'message error';
+          messageDiv.textContent = data.error || 'Registration failed';
+        }
+      } catch (error) {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = 'Connection error. Please try again.';
+      }
+    });
+  </script>
+</body>
+</html>

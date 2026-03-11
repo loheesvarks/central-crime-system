@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crime Record System</title>
+  <style>
+    body { font-family: Arial; margin: 30px; background: #f3f6fa; }
+    h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid #aaa; }
+    th, td { padding: 10px; text-align: center; }
+    input, button, select { padding: 6px; margin: 4px; }
+    .form, .filter-bar { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+    button { cursor: pointer; border: none; background: #0078d7; color: white; border-radius: 4px; }
+    button:hover { background: #005fa3; }
+    .filter-bar input, .filter-bar select { border: 1px solid #bbb; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h2>Crime Record Management System</h2>
+  
+  <div class="form">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="crime" placeholder="Crime" required>
+    <input type="date" id="born_date" placeholder="Born Date" required>
+    <input type="date" id="crime_date" placeholder="Crime Date" required>
+    <input type="number" id="age" placeholder="Age" readonly>
+    <button id="addBtn">Add</button>
+    <button id="updateBtn" disabled>Update</button>
+    <button id="deleteAllBtn">Delete All</button>
+  </div>
+
+  <!-- 🔍 Filter Section -->
+  <div class="filter-bar">
+    <input type="text" id="filterName" placeholder="Filter by Name">
+    <input type="text" id="filterCrime" placeholder="Filter by Crime Type">
+    <input type="number" id="filterAge" placeholder="Filter by Age">
+    <button id="filterBtn">Apply Filter</button>
+    <button id="clearFilterBtn">Clear</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Crime</th>
+        <th>Born Date</th>
+        <th>Crime Date</th>
+        <th>Age</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="recordsTable"></tbody>
+  </table>
+
+  <script>
+    const API = 'http://localhost:3000';
+    const table = document.getElementById('recordsTable');
+    const addBtn = document.getElementById('addBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const deleteAllBtn = document.getElementById('deleteAllBtn');
+    const filterBtn = document.getElementById('filterBtn');
+    const clearFilterBtn = document.getElementById('clearFilterBtn');
+    let allData = [];
+    let currentId = null;
+
+    document.getElementById('born_date').addEventListener('change', calcAge);
+    function calcAge() {
+      const dob = new Date(document.getElementById('born_date').value);
+      const diff = Date.now() - dob.getTime();
+      const age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+      document.getElementById('age').value = age;
+    }
+
+    async function loadRecords() {
+      const res = await fetch(API + '/records');
+      const data = await res.json();
+      allData = data;
+      renderTable(allData);
+    }
+
+    function renderTable(data) {
+      table.innerHTML = '';
+      data.forEach(r => {
+        const row = `
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.name}</td>
+            <td>${r.crime}</td>
+            <td>${r.born_date ? r.born_date.substring(0,10) : ''}</td>
+            <td>${r.crime_date ? r.crime_date.substring(0,10) : ''}</td>
+            <td>${r.age}</td>
+            <td>
+              <button onclick="editRecord(${r.id}, '${r.name}', '${r.crime}', '${r.born_date}', '${r.crime_date}', ${r.age})">Edit</button>
+              <button onclick="deleteRecord(${r.id})">Delete</button>
+            </td>
+          </tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    addBtn.onclick = async () => {
+      const record = getFormData();
+      await fetch(API + '/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      });
+      clearForm();
+      loadRecords();
+    };
+
+    updateBtn.onclick = async () => {
+      const record = getFormData();
+      await fetch(`${API}/update/${currentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      });
+      clearForm();
+      updateBtn.disabled = true;
+      addBtn.disabled = false;
+      loadRecords();
+    };
+
+    deleteAllBtn.onclick = async () => {
+      if (confirm('Delete all records?')) {
+        await fetch(API + '/delete-all', { method: 'DELETE' });
+        loadRecords();
+      }
+    };
+
+    async function deleteRecord(id) {
+      await fetch(`${API}/delete/${id}`, { method: 'DELETE' });
+      loadRecords();
+    }
+
+    function editRecord(id, name, crime, born, crimeDate, age) {
+      document.getElementById('name').value = name;
+      document.getElementById('crime').value = crime;
+      document.getElementById('born_date').value = born.substring(0,10);
+      document.getElementById('crime_date').value = crimeDate.substring(0,10);
+      document.getElementById('age').value = age;
+      currentId = id;
+      updateBtn.disabled = false;
+      addBtn.disabled = true;
+    }
+
+    function getFormData() {
+      return {
+        name: document.getElementById('name').value,
+        crime: document.getElementById('crime').value,
+        born_date: document.getElementById('born_date').value,
+        crime_date: document.getElementById('crime_date').value,
+        age: document.getElementById('age').value
+      };
+    }
+
+    function clearForm() {
+      document.getElementById('name').value = '';
+      document.getElementById('crime').value = '';
+      document.getElementById('born_date').value = '';
+      document.getElementById('crime_date').value = '';
+      document.getElementById('age').value = '';
+    }
+
+    // 🔍 Filter functionality
+    filterBtn.onclick = () => {
+      const name = document.getElementById('filterName').value.toLowerCase();
+      const crime = document.getElementById('filterCrime').value.toLowerCase();
+      const age = document.getElementById('filterAge').value;
+
+      const filtered = allData.filter(r =>
+        (name === '' || r.name.toLowerCase().includes(name)) &&
+        (crime === '' || r.crime.toLowerCase().includes(crime)) &&
+        (age === '' || r.age == age)
+      );
+
+      renderTable(filtered);
+    };
+
+    clearFilterBtn.onclick = () => {
+      document.getElementById('filterName').value = '';
+      document.getElementById('filterCrime').value = '';
+      document.getElementById('filterAge').value = '';
+      renderTable(allData);
+    };
+
+    loadRecords();
+  </script>
+</body>
+</html>
+
+

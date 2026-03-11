@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Central Crime System Management</title>
+  <link rel="stylesheet" href="styles-premium.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>🔒 Central Crime System Management</h1>
+        <p>National Crime Database - Secure Login Portal</p>
+      </div>
+      
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" required placeholder="Enter username">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="Enter password">
+        </div>
+        
+        <button type="submit" class="btn-primary">Login</button>
+        
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="register.html">Register here</a></p>
+        </div>
+      </form>
+      
+      <div id="message" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const messageDiv = document.getElementById('message');
+      
+      try {
+        const response = await fetch(`${window.location.hostname === 'localhost' ? 'http://localhost:3000' : window.location.origin}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          messageDiv.className = 'message success';
+          messageDiv.textContent = 'Login successful! Redirecting...';
+          setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        } else {
+          messageDiv.className = 'message error';
+          messageDiv.textContent = data.error || 'Login failed';
+        }
+      } catch (error) {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = 'Connection error. Please try again.';
+      }
+    });
+  </script>
+</body>
+</html>

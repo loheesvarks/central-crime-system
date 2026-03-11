@@ -1,0 +1,28 @@
+{
+  "name": "central-crime-system",
+  "version": "1.0.0",
+  "description": "Central Crime System Management - National Crime Database",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "keywords": ["crime", "management", "database"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.15.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {}
+}
