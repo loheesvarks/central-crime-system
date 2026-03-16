@@ -21,14 +21,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Health check route (should work even if DB is down)
+// Redirect root to login page
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Crime System API is running',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV || 'development'
-  });
+  res.redirect('/login.html');
 });
 
 app.get('/health', (req, res) => {
