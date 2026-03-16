@@ -9,11 +9,13 @@ const config = require('./config/config');
 
 const app = express();
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log('✅ Created uploads directory');
+// Create uploads directory if it doesn't exist (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  const uploadsDir = path.join(__dirname, 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('✅ Created uploads directory');
+  }
 }
 
 app.use(cors());
@@ -30,10 +32,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', port: process.env.PORT || 3000 });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/records', recordRoutes);
-app.use('/api/upload', uploadRoutes);
+// Routes with error handling
+try {
+  app.use('/api/auth', authRoutes);
+  app.use('/api/records', recordRoutes);
+  app.use('/api/upload', uploadRoutes);
+} catch (error) {
+  console.error('Error loading routes:', error);
+}
 
 // News API proxy (to avoid CORS issues)
 app.get('/api/news', async (req, res) => {
