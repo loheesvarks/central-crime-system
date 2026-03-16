@@ -7,7 +7,11 @@
     "start": "node app.js",
     "dev": "node app.js"
   },
-  "keywords": ["crime", "management", "database"],
+  "keywords": [
+    "crime",
+    "management",
+    "database"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -24,5 +28,7 @@
     "mysql2": "^3.15.2",
     "node-fetch": "^3.3.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^10.0.3"
+  }
 }
