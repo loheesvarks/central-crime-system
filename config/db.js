@@ -12,31 +12,11 @@ const db = mysql.createConnection({
 db.connect(err => {
   if (err) {
     console.error('❌ MySQL Connection Error:', err);
-    console.log('Attempting to create database...');
+    console.log('⚠️  App will continue without database connection');
+    console.log('📝 Make sure to add MySQL service in Railway dashboard');
     
-    // Try to create database if it doesn't exist
-    const tempDb = mysql.createConnection({
-      host: config.DB_HOST,
-      user: config.DB_USER,
-      password: config.DB_PASSWORD,
-      port: config.DB_PORT
-    });
-    
-    tempDb.query(`CREATE DATABASE IF NOT EXISTS ${config.DB_NAME}`, (err) => {
-      if (err) {
-        console.error('Failed to create database:', err);
-        throw err;
-      }
-      console.log('✅ Database created, reconnecting...');
-      tempDb.end();
-      
-      // Reconnect with database
-      db.connect(err => {
-        if (err) throw err;
-        console.log('✅ MySQL Connected!');
-        createTables();
-      });
-    });
+    // Don't crash the app, just log the error
+    // The health check routes will still work
   } else {
     console.log('✅ MySQL Connected!');
     createTables();

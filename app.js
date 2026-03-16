@@ -21,6 +21,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Health check route (should work even if DB is down)
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Crime System API is running',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', port: process.env.PORT || 3000 });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/records', recordRoutes);
@@ -60,13 +74,39 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 const PORT = config.PORT;
+
+console.log('🚀 Starting Crime System Server...');
+console.log('📊 Config:', {
+  PORT: config.PORT,
+  DB_HOST: config.DB_HOST,
+  DB_NAME: config.DB_NAME,
+  NODE_ENV: process.env.NODE_ENV || 'development'
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📱 Login page: http://localhost:${PORT}/login.html`);
   console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard.html`);
+  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   if (config.NEWS_API_KEY === 'YOUR_NEWS_API_KEY') {
     console.log('⚠️  News API key not configured. Get one from https://newsapi.org');
   }
+}).on('error', (err) => {
+  console.error('❌ Server failed to start:', err);
 });
