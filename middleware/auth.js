@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'jpmc_crime_system_2026_secure_key';
+const config = require('../config/config');
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -9,7 +9,7 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, config.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
@@ -17,4 +17,4 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, SECRET_KEY };
+module.exports = { authenticateToken, JWT_SECRET: config.JWT_SECRET };
