@@ -1,24 +1,27 @@
 const mysql = require('mysql2');
 const config = require('./config');
 
-const db = mysql.createConnection({
+// Use connection pool instead of single connection
+const db = mysql.createPool({
   host: config.DB_HOST,
   user: config.DB_USER,
   password: config.DB_PASSWORD,
   database: config.DB_NAME,
-  port: config.DB_PORT
+  port: config.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-db.connect(err => {
+// Test the connection
+db.getConnection((err, connection) => {
   if (err) {
     console.error('❌ MySQL Connection Error:', err);
     console.log('⚠️  App will continue without database connection');
-    console.log('📝 Make sure to add MySQL service in Railway dashboard');
-    
-    // Don't crash the app, just log the error
-    // The health check routes will still work
+    console.log('📝 Make sure MySQL is running and credentials are correct');
   } else {
     console.log('✅ MySQL Connected!');
+    connection.release();
     createTables();
   }
 });
