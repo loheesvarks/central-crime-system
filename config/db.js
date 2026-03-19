@@ -12,7 +12,7 @@ const db = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   ssl:{
-    rejectedUnauthorized: false
+    rejectUnauthorized: false
   }
 });
 
