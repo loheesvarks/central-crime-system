@@ -10,7 +10,10 @@ const db = mysql.createPool({
   port: config.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  ssl:{
+    rejectedUnauthorized: false
+  }
 });
 
 // Test the connection
